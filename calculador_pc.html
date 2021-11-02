@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Calculador de propiedades hídricas</title>
+		
+<style>
+@media screen and (max-width:1200px){
+#caja {font-size:2vw;}
+}
+@media screen and (min-width:1201px){
+#caja {font-size:1vw;}
+}
+
+
+#caja {width:100vw; text-align: left; padding: 1em;}
+ 
+
+        
+body {
+            font-family: sans-serif;
+        }
+
+p  {
+            color: rgb(2,65,98);font-size: 100%;
+        }
+h2 {
+            color: rgb(150,65,98);
+		}
+h3 	{
+            color: rgb(150,65,98); text-align:center;
+			font-size: 1.3em;
+		}	
+.boton {
+            border:3px black solid;border-radius:25px;height:10%;background:rgb(150,65,98);float:left; color: white;font-size:1em  }
+        
+#expr {
+            font-size: 0.8em;
+        }        
+h1 {
+             text-align: left;
+        }
+		
+
+.campo {
+             position: absolute; left: 11em; font-size:100%
+        }
+		
+.campores {
+             position: absolute; left: 20em; font-size:100%
+        }
+		
+#lim	{ 
+		background-color: rgba(150,65,98,0.2);
+		}
+.campores	{ 
+		background-color: rgba(150,65,98,0.2);
+		}  
+table td:first-child {
+  width: 50vw;
+}
+table td:nth-child(2) {
+ width: 40vw;
+ margin-left: auto;
+ margin-right: auto;
+ border: orange 5px solid;
+ padding-bottom: 1%;
+}
+
+#Canvas1{width:80%;
+/** lo que sigue centra el triangulo*/
+	/**padding-left: 0;
+    padding-right: 0;*/
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+
+}
+
+</style>
+
+
+    
+	</head>
+    <body>
+
+	<div id="caja">
+		<h1>Calculador de propiedades hídricas</h1>
+			<table>
+				<td>
+
+					<form name="calc">
+						
+						
+											
+					
+						<p>Arcilla (%) <input type="Text" name="arcilla" value="0" size="5" class="campo"> </p>
+
+						<p>Arena (%)<input type="Text" name="arena" value="0" size="5" class="campo"></p>	
+						
+						<p>Limo (%)<input type="Text" name="limo" value="0" size="5" class="campo" id="lim"></p>
+						
+						<p>Horizonte (opcional)<input type="Text" name="horizonte" size="5" id="horiz" class="campo"></p> 
+									
+						<input type="Button" name="botoncalc" value=" CALCULAR" onclick="calcula()" id="botcalc" class="boton"> <br> <br>
+
+						<p>Porosidad Total (%)<input type="Text" name="PT" value="0" size="5" class="campores"></p>
+						<p>Densidad Aparente (g/cm<sup>3</sup>)<input type="Text" name="DA" value="0" size="5" class="campores"></p>
+						<p>Contenido hídrico a CC (% v/v)<input type="Text" name="CC" value="0" size="5" class="campores"></p>
+						<p>Contenido hídrico a PMP (% v/v)<input type="Text" name="PMP" value="0" size="5" class="campores"></p>
+						<p>Conductividad hidráulica saturada (cm/h)<input type="Text" name="CHS" value="0" size="5" class="campores"></p> <br>
+						<input type="Button" name="botonlimp" value=" LIMPIAR TRIÁNGULO" onclick="LIMPIAR()" id="botlimp" class="boton">				
+					</form>
+					
+				</td>
+				
+				<td>
+					<H3> Clase Textural</H3>
+					<canvas id="Canvas1"; border: 1px solid black></canvas>
+					<script>
+						var Canvas1 = document.getElementById("Canvas1");
+						var context = Canvas1.getContext("2d");
+						
+						Canvas1.width = 523;
+						Canvas1.height = 452;
+						var img = new Image();
+						//img.src = "TRIANGULO CON NOMBRES DE CLSES TEXTURALES.png"; este es si se puede alojar la imagen del canvas en el mismo lugar que la página
+						img.src = "http://drive.google.com/uc?export=view&id=13NdIJArZPgAnpvztv6oq9mmW0MfLVpch"; //este es para usar la imagen del drive
+						//context.drawImage(img, 0, 0);
+						img.onload = function(){
+						context.drawImage(img, 0, 0);
+						//lo siguiente es para que se noten mejor los nombres de los horizontes en el triángulo
+						//context.fillStyle = "rgba(255,255,255,0.3)";
+						//context.fillRect(0, 0, Canvas1.width, Canvas1.height);
+						}
+					</script>
+				</td>
+			</table>
+	
+	
+		
+		<script>
+			
+				
+			function calcula(){
+			
+				var arcilla = document.calc.arcilla.value
+				var arena = document.calc.arena.value 
+				var limo = 100-arena-arcilla
+				
+				
+								
+					var resultPT = (0.332 - 7.251*10**-4*arena+ 0.1276 * Math.log10(arcilla))*100
+					var resultDA = (1-resultPT/100)*2.65
+					
+					var coefA = Math.exp(-4.396 - 0.0715 * arcilla - 4.88e-4 * arena**2 - 4.285e-5 * arena**2 * arcilla)
+								
+					var coefB = - 3.140 - 0.00222 * arcilla**2 - 3.484e-5 * arena**2 * arcilla
+				
+				
+					var resultDA = (1-resultPT/100)*2.65
+					var resultCC = 	100*Math.pow((0.3333/ coefA),(1.0 / coefB))			
+					var resultPMP = 100*Math.pow((15.0  / coefA),(1.0 / coefB))
+					var resultCHS = Math.exp((12.012 - 0.0755 * arena) + (- 3.895 + 0.03671 * arena - 0.1103 * arcilla + 8.7546e-4 * arcilla**2) / (resultPT/100))					
+				
+					
+							
+					
+				document.calc.PT.value = resultPT.toFixed(2)
+				document.calc.DA.value = resultDA.toFixed(2)
+				document.calc.limo.value = limo.toFixed(2)	
+				document.calc.CC.value = resultCC.toFixed(2)
+				document.calc.PMP.value = resultPMP.toFixed(2)	
+				document.calc.CHS.value = resultCHS.toFixed(2)	
+				
+
+
+				//Movimiento punto en triángulo
+						
+						// definición de la coordenada arcilla (eje Y) del punto del triángulo
+						var arcillaTR = 452-(document.calc.arcilla.value*452/100)
+						
+						
+						//definición de la coordenada x del punto del triángulo (basado en la arena)
+						// tangente = opuesto / adyacente; tangente de 60º = raiz cuadrada de tres
+							
+						var XdeArenaTR = 523-(document.calc.arena.value*523/100)
+						var XdePunto= XdeArenaTR-(452-arcillaTR)/Math.pow(3, 0.5)-5
+						var Vhoriz =  document.calc.horizonte.value				
+						var Vanchocanvas = Canvas1.width
+						var Valtocanvas = Canvas1.height
+						var Vlonghoriz = document.calc.horizonte.value.length //mide el largo del nombre del horizonte
+						
+						
+						
+						context.fillStyle = "rgb(150,65,98)";
+						context.shadowOffsetX = 1;
+						context.shadowOffsetY = 1;
+						context.shadowBlur = 4;
+						context.shadowColor = "rgba(255,255,255,1)";
+						
+						//dibujo del punto
+						context.fillRect(XdePunto, arcillaTR-5, 10, 10);
+						
+						context.font="bold 1em arial";
+						context.fillStyle = "rgb(150,65,98)";
+						
+						if (XdePunto < Vanchocanvas/2) {
+						context.fillText(Vhoriz,XdePunto+12, arcillaTR+5);
+						
+						}
+						else {
+						context.fillText(Vhoriz,XdePunto-Vlonghoriz*12, arcillaTR+5);
+						
+						}
+			}
+					
+						
+			function LIMPIAR (){
+				var Vanchocanvas = Canvas1.width
+				var Valtocanvas = Canvas1.height
+				context.clearRect(0, 0, Vanchocanvas, Valtocanvas);
+				document.calc.arcilla.value=0;
+				document.calc.arena.value =0;
+				document.calc.PT.value = 0;
+				document.calc.DA.value = 0;
+				document.calc.limo.value = 0;
+				document.calc.CC.value = 0;
+				document.calc.PMP.value = 0;	
+				document.calc.CHS.value = 0;
+				document.calc.horizonte.value = "";
+				context.drawImage(img, 0, 0);
+				}
+				
+		</script> 
+		
+		
+		</div>	
+		
+	<a href="Calculador.html">Si estás usando un celular hacé click acá</a>	
+		
+    </body>
+	
+
+
+</html>
